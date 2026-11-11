@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Админ-панель · Chicken Hot</title>
+<meta name="theme-color" content="#151515">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Вход -->
+<section class="login" id="login" hidden>
+  <form class="login-box" id="loginForm">
+    <img src="img/logo.png" alt="" width="72" height="72">
+    <h1>Chicken Hot</h1>
+    <p class="muted">Админ-панель</p>
+    <div class="field" id="emailField"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" placeholder="admin@mail.com"></div>
+    <div class="field"><label for="l-pass">Пароль</label>
+      <div class="pass-wrap"><input id="l-pass" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" class="eye" id="eyeBtn" aria-label="Показать пароль">👁</button></div></div>
+    <p class="err-msg" id="loginErr"></p>
+    <button class="btn btn-primary btn-block" type="submit">Войти</button>
+    <p class="muted small" id="loginHint"></p>
+  </form>
+</section>
+
+<!-- Панель -->
+<div class="app" id="app" hidden>
+  <header class="bar">
+    <div class="bar-in">
+      <a class="brand" href="index.html" target="_blank" title="Открыть сайт"><img src="img/logo.png" alt="" width="36" height="36"><span><b>Chicken Hot</b><small>Админ-панель</small></span></a>
+      <nav class="tabs" id="tabs">
+        <button data-tab="orders" class="on">Заказы <i class="dot" id="newDot" hidden></i></button>
+        <button data-tab="report">Отчёт</button>
+        <button data-tab="menu">Меню</button>
+        <button data-tab="promos">Акции</button>
+        <button data-tab="settings">Настройки</button>
+      </nav>
+      <button class="btn btn-ghost sm" id="logoutBtn">Выйти</button>
+    </div>
+  </header>
+
+  <div class="demo-banner" id="demoBanner" hidden>
+    <b>Демо-режим.</b> Изменения сохраняются только в этом браузере. Чтобы админка меняла сайт для всех клиентов — подключите Supabase (инструкция в README.md).
+  </div>
+
+  <main class="main">
+    <!-- Заказы -->
+    <section class="tab" id="tab-orders">
+      <div class="stats" id="stats"></div>
+      <div class="toolbar">
+        <input class="search" id="orderSearch" type="search" placeholder="Поиск: имя, телефон, № или адрес">
+        <button class="btn btn-ghost sm" id="refreshOrders">Обновить</button>
+      </div>
+      <div class="chips" id="orderFilter" style="margin-bottom:12px"></div>
+      <div class="orders" id="orders"></div>
+    </section>
+
+    <!-- Отчёт -->
+    <section class="tab" id="tab-report" hidden>
+      <div class="chips" id="reportPeriod" style="margin-bottom:12px"></div>
+      <div class="stats" id="reportStats"></div>
+      <div class="report-grid">
+        <div class="card"><h2 class="h2">Топ блюд</h2><div id="topItems"></div></div>
+        <div class="card"><h2 class="h2">По дням</h2><div id="byDay"></div></div>
+        <div class="card"><h2 class="h2">Оплата</h2><div id="byPay"></div></div>
+      </div>
+    </section>
+
+    <!-- Меню -->
+    <section class="tab" id="tab-menu" hidden>
+      <div class="toolbar">
+        <input class="search" id="menuSearch" type="search" placeholder="Поиск блюда…">
+        <select class="select" id="menuCat"></select>
+        <button class="btn btn-ghost sm" id="catsBtn">Категории</button>
+        <button class="btn btn-ghost sm" id="bulkBtn">Цены ±%</button>
+        <button class="btn btn-primary sm" id="addItemBtn">+ Блюдо</button>
+      </div>
+      <p class="muted small" style="margin:-4px 0 12px">Переключатель «В наличии» — стоп-лист: выключите, и блюдо станет недоступно для заказа.</p>
+      <div class="items" id="items"></div>
+    </section>
+
+    <!-- Акции -->
+    <section class="tab" id="tab-promos" hidden>
+      <div class="toolbar">
+        <h2 class="h2">Акции и баннеры</h2>
+        <button class="btn btn-primary sm" id="addPromoBtn">+ Акция</button>
+      </div>
+      <div class="items" id="promoList"></div>
+    </section>
+
+    <!-- Настройки -->
+    <section class="tab" id="tab-settings" hidden>
+      <form class="card form" id="settingsForm">
+        <h2 class="h2">Основное</h2>
+        <div class="grid2">
+          <div class="field"><label>Город</label><input name="city"></div>
+          <div class="field"><label>Телефон (как показывать)</label><input name="phone" placeholder="+7 708 597 72 35"></div>
+          <div class="field"><label>WhatsApp для заказов (только цифры)</label><input name="whatsapp" inputmode="numeric" placeholder="77085977235"></div>
+          <div class="field"><label>Instagram (без @)</label><input name="instagram"></div>
+          <div class="field full"><label>Слоган</label><input name="tagline"></div>
+          <div class="field full"><label>Адрес (необязательно)</label><input name="address" placeholder="Если есть самовывоз или кухня"></div>
+        </div>
+        <h2 class="h2">Время работы и доставка</h2>
+        <div class="grid2">
+          <div class="field"><label>Открываемся</label><input name="open" type="time"></div>
+          <div class="field"><label>Закрываемся</label><input name="close" type="time"></div>
+          <div class="field"><label>Доставка от, ₸</label><input name="deliveryFrom" type="number" min="0" step="50"></div>
+          <div class="field"><label>Бесплатная доставка от, ₸</label><input name="freeFrom" type="number" min="0" step="100"></div>
+          <div class="field full"><label>Способы оплаты (через запятую)</label><input name="payments" placeholder="Kaspi перевод, Kaspi RED, Наличные курьеру"></div>
+          <div class="field full"><label>Объявление вверху сайта (пусто — не показывать)</label><input name="notice" placeholder="Например: Сегодня работаем до 22:00"></div>
+        </div>
+        <label class="switch-row"><input type="checkbox" name="acceptOrders"><span class="switch"></span>Принимать онлайн-заказы</label>
+        <label class="switch-row"><input type="checkbox" name="kaspiRed"><span class="switch"></span>Показывать значок Kaspi RED</label>
+        <button class="btn btn-primary" type="submit">Сохранить настройки</button>
+      </form>
+
+      <div class="card form">
+        <h2 class="h2">Резервная копия</h2>
+        <p class="muted small">Скачайте меню в файл перед большими изменениями. Из файла можно всё восстановить.</p>
+        <div class="row-btns">
+          <button class="btn btn-ghost" id="exportBtn">Скачать копию</button>
+          <label class="btn btn-ghost">Загрузить из файла<input type="file" id="importFile" accept=".json,application/json" hidden></label>
+          <button class="btn btn-danger" id="resetBtn">Вернуть стандартное меню</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="modalTitle"></h3><button class="icon-btn" data-close-modal aria-label="Закрыть">✕</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading" id="loading"><img src="img/logo.png" alt=""></div>
+
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
